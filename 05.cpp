@@ -57,13 +57,13 @@ static std::istream& ignore_line(std::istream& in)
 [[nodiscard]]
 static std::vector<std::vector<char>> parse_crates(std::istream& in)
 {
-	constexpr const char no_crate[] = "   ";
+	constexpr const char empty[] = "   ";
 	char buf[5];
 	std::vector<std::vector<char>>::size_type column = 0;
 	std::locale loc;
 	std::vector<std::vector<char>> result;
 	while (in.get(buf, 5) && buf[1] != '1') {
-		if (!std::equal(std::execution::unseq, buf, buf + 3, no_crate)) {
+		if (!std::equal(std::execution::unseq, buf, buf + 3, empty)) {
 			check_crate(buf, loc);
 			if (column + 1 > result.size())
 				result.resize(column + 1);

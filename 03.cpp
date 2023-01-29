@@ -156,7 +156,7 @@ template<> output_pair day<3>(std::istream& in)
 		s << "Error while parsing rucksack " << n;
 		throw std::runtime_error(s.str());
 	} else if (!p) [[unlikely]] {
-		throw std::runtime_error("Rucksack number is not divisible by 3");
+		throw std::runtime_error("Rucksacks can't be grouped by 3");
 	}
 	return {p.priority(), p.badges()};
 }
