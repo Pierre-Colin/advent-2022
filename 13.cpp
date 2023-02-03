@@ -11,7 +11,7 @@
 
 #include "common.h"
 
-// NOTE: might be ablo to refactor this... code sure is long
+namespace {
 
 class value {
 public:
@@ -32,8 +32,6 @@ public:
 	static value separation_packet(std::uintmax_t n);
 
 private:	
-	value to_list() const;
-
 	static constexpr bool nothrow_move =
 		std::is_nothrow_move_constructible_v<list_type>;
 
@@ -139,15 +137,6 @@ std::strong_ordering value::operator<=>(const value& rhs) const noexcept
 	return std::visit(visitor{}, data, rhs.data);
 }
 
-value value::to_list() const
-{
-	if (std::holds_alternative<list_type>(data)) [[unlikely]]
-		throw std::logic_error("Value already holds a list");
-	list_type l;
-	l.emplace_back(std::make_unique<value>(std::get<std::uintmax_t>(data)));
-	return value(std::move(l));
-}
-
 value value::separation_packet(const std::uintmax_t n)
 {
 	list_type inner;
@@ -155,6 +144,8 @@ value value::separation_packet(const std::uintmax_t n)
 	list_type outer;
 	outer.emplace_back(std::make_unique<value>(std::move(inner)));
 	return value{std::move(outer)};
+}
+
 }
 
 template<> output_pair day<13>(std::istream& in)
