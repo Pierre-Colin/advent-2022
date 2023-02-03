@@ -15,6 +15,12 @@ public:
 		, max{}
 	{}
 
+	constexpr interval(T a)
+		noexcept(noexcept(min = a))
+		: min{a}
+		, max{static_cast<T&&>(a)}
+	{}
+
 	constexpr interval(T a, T b)
 		noexcept(noexcept(a = static_cast<T&&>(b)))
 		: min{static_cast<T&&>(a)}
