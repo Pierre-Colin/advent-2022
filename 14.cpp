@@ -11,6 +11,7 @@
 
 #include "common.h"
 #include "interval.h"
+#include "interval_union.h"
 
 namespace {
 
@@ -20,16 +21,6 @@ struct point {
 
 	std::intmax_t x;
 	std::intmax_t y;
-};
-
-class interval_union {
-public:
-	void insert(std::intmax_t x);
-	void insert(interval<std::intmax_t>&& x);
-	[[nodiscard]] bool contains(std::intmax_t x) const noexcept;
-
-private:
-	std::vector<interval<std::intmax_t>> state{};
 };
 
 class sand_simulation {
@@ -52,63 +43,6 @@ private:
 	std::intmax_t floor_y{};
 	std::map<std::intmax_t, interval_union> obstacles{};
 };
-
-void interval_union::insert(const std::intmax_t x)
-{
-	struct comp_low {
-		using type = interval<std::intmax_t>;
-		constexpr bool
-		operator()(std::intmax_t a, const type& b) const noexcept {
-			return a < b.lower_bound();
-		}
-	};
-	auto it = std::upper_bound(state.begin(), state.end(), x, comp_low{});
-	it = state.emplace(it, x);
-	if (it != state.begin())
-		--it;
-	while (it + 1 != state.end()) {
-		if (it->upper_bound() + 1 >= (it + 1)->lower_bound()) {
-			*it = interval(it->lower_bound(),
-			               std::max(it->upper_bound(),
-			                        (it + 1)->upper_bound()));
-			it = state.erase(it + 1) - 1;
-		} else {
-			++it;
-		}
-	}
-}
-
-void interval_union::insert(interval<std::intmax_t>&& x)
-{
-	struct comp_low {
-		using type = interval<std::intmax_t>;
-		constexpr bool
-		operator()(const type& a, const type& b) const noexcept {
-			return a.lower_bound() < b.lower_bound();
-		}
-	};
-	auto it = std::upper_bound(state.begin(), state.end(), x, comp_low{});
-	it = state.emplace(it, std::move(x));
-	if (it != state.begin())
-		--it;
-	while (it + 1 != state.end()) {
-		if (it->upper_bound() + 1 >= (it + 1)->lower_bound()) {
-			*it = interval(it->lower_bound(),
-			               std::max(it->upper_bound(),
-			                        (it + 1)->upper_bound()));
-			it = state.erase(it + 1) - 1;
-		} else {
-			++it;
-		}
-	}
-}
-
-bool interval_union::contains(const std::intmax_t x) const noexcept
-{
-	const interval i{x};
-	const auto it = std::lower_bound(state.cbegin(), state.cend(), i);
-	return it != state.cend() && it->contains(x);
-}
 
 bool expect_arrow(std::istream& in)
 {

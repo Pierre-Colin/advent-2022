@@ -1,4 +1,6 @@
 #if defined __cplusplus && __cplusplus >= 202002L
+#ifndef INTERVAL_CPP
+#define INTERVAL_CPP
 #include <compare>
 #include <concepts>
 
@@ -68,6 +70,7 @@ private:
 	T min;
 	T max;
 };
+#endif
 #else
 #error This header is for C++20 or later
 #endif

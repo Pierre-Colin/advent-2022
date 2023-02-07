@@ -2,13 +2,15 @@
 CPP=g++ -std=c++20
 CPPFLAGS=-Wall -Wextra -Wpedantic -Weffc++ -Wshadow -Wconversion -Og -g -pg
 LDFLAGS=
-OBJ=advent.o common.o 01.o 02.o 03.o 04.o 05.o 06.o 07.o 08.o 09.o 10.o 11.o\
-12.o 13.o 14.o 15.o 16.o 17.o 18.o 19.o 20.o 21.o 22.o 23.o 24.o 25.o
+OBJ=advent.o common.o interval_union.o 01.o 02.o 03.o 04.o 05.o 06.o 07.o 08.o\
+09.o 10.o 11.o 12.o 13.o 14.o 15.o 16.o 17.o 18.o 19.o 20.o 21.o 22.o 23.o\
+24.o 25.o
 
 advent: $(OBJ)
 	$(CPP) $(CPPFLAGS) $(LDFLAGS) -o $@ $(OBJ)
 
 advent.o: advent.cpp common.h
+interval_union.o: interval_union.cpp interval.h interval_union.h
 01.o: 01.cpp common.h
 02.o: 02.cpp common.h
 03.o: 03.cpp common.h
@@ -22,8 +24,8 @@ advent.o: advent.cpp common.h
 11.o: 11.cpp common.h
 12.o: 12.cpp common.h
 13.o: 13.cpp common.h
-14.o: 14.cpp common.h
-15.o: 15.cpp common.h
+14.o: 14.cpp common.h interval.h interval_union.h
+15.o: 15.cpp common.h interval.h interval_union.h
 16.o: 16.cpp common.h
 17.o: 17.cpp common.h
 18.o: 18.cpp common.h
