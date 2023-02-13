@@ -12,6 +12,8 @@
 #include "interval.h"
 #include "interval_union.h"
 
+// TODO: try to optimize the interval_union away
+
 namespace {
 
 [[nodiscard]] constexpr std::uintmax_t abs(std::intmax_t x) noexcept;
