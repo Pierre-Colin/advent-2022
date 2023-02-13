@@ -4,11 +4,11 @@
 #include <istream>
 #include <limits>
 #include <map>
-#include <string_view>
 #include <utility>
 #include <vector>
 
 #include "common.h"
+#include "read.h"
 
 namespace {
 
@@ -21,16 +21,6 @@ struct vertex_input_data {
 	unsigned name{};
 	vertex_data data{};
 };
-
-std::istream& read_expect(std::istream& in, std::string_view s)
-{
-	char buf[25];
-	if (s.size() > sizeof buf) [[unlikely]]
-		throw std::logic_error("Input buffe is too small");
-	if (!in.read(buf, s.size()) || !std::equal(s.begin(), s.end(), buf))
-		in.setstate(std::ios_base::failbit);
-	return in;
-}
 
 constexpr int letter_id(const char c)
 {

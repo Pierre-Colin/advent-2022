@@ -8,11 +8,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <utility>
 #include <vector>
 
 #include "common.h"
+#include "read.h"
 
 using namespace std::literals;
 
@@ -23,19 +23,6 @@ struct instruction {
 };
 
 namespace {
-
-static std::istream& read_expect(std::istream& in, std::string_view s)
-{
-	char buf[5];
-	if (std::size(s) > sizeof buf) [[unlikely]]
-		throw std::logic_error("Input buffer is too small");
-	if (!in.read(buf, std::size(s)))
-		return in;
-	if (!std::equal(std::execution::unseq, std::cbegin(s), std::cend(s),
-	                std::cbegin(buf)))
-		in.setstate(std::ios_base::failbit);
-	return in;
-}
 
 static void check_crate(std::span<const char, 5> buf, const std::locale& loc)
 {

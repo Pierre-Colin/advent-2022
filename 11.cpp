@@ -6,11 +6,11 @@
 #include <limits>
 #include <numeric>
 #include <stdexcept>
-#include <string_view>
 #include <utility>
 #include <vector>
 
 #include "common.h"
+#include "read.h"
 
 enum class operation { add, multiply };
 
@@ -47,18 +47,6 @@ private:
 	std::vector<monkey> monkeys{};
 	std::uintmax_t product_tests = 1;
 };
-
-static std::istream& read_expect(std::istream& in, std::string_view s)
-{
-	char buf[29];
-	if (sizeof buf < std::size(s)) [[unlikely]]
-		throw std::logic_error("read_expect buffer is too small");
-	if (!in.read(buf, std::size(s)))
-		return in;
-	if (!std::equal(std::execution::unseq, s.cbegin(), s.cend(), buf))
-		in.setstate(std::ios_base::failbit);
-	return in;
-}
 
 static std::istream& operator>>(std::istream& in, monkey& m)
 {

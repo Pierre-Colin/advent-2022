@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cstdint>
 #include <functional>
 #include <ios>
@@ -10,6 +9,7 @@
 #include <vector>
 
 #include "common.h"
+#include "read.h"
 
 namespace {
 
@@ -27,7 +27,6 @@ struct blueprint {
 constexpr unsigned int max_geodes(const blueprint& bp, int t) noexcept;
 
 static bool consume_whitespace_characters(std::istream& in);
-static std::istream& read_expect(std::istream& in, std::string_view sv);
 
 class factory {
 public:
@@ -130,15 +129,6 @@ static bool consume_whitespace_characters(std::istream& in)
 	       || c == traits::to_int_type('\n'))
 		in.ignore();
 	return in.good();
-}
-
-static std::istream& read_expect(std::istream& in, std::string_view sv)
-{
-	std::unique_ptr<char[]> buf = std::make_unique<char[]>(sv.size());
-	if (!in.read(buf.get(), sv.size())
-	    || !std::equal(sv.cbegin(), sv.cend() - 1, buf.get()))
-		in.setstate(std::ios_base::failbit);
-	return in;
 }
 
 constexpr unsigned int backtrack(const blueprint& bp, const state& s, int t)
