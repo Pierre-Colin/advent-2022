@@ -31,7 +31,7 @@ read.o: read.cpp read.h
 17.o: 17.cpp common.h
 18.o: 18.cpp common.h
 19.o: 19.cpp common.h read.h
-20.o: 20.cpp common.h
+20.o: 20.cpp common.h checked.h
 21.o: 21.cpp common.h
 22.o: 22.cpp common.h
 23.o: 23.cpp common.h
