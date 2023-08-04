@@ -47,12 +47,14 @@ static constexpr output_pair (*days[])(std::istream&) = {
 	day<18>, day<19>, day<20>, day<21>, day<22>, day<23>, day<24>, day<25>
 };
 
+static constexpr auto ndays = std::size(days);
+
 static constexpr unsigned job_time[] = {
 	3, 4, 5, 3, 3, 4, 5, 3, 12, 3, 24, 9, 26, 820, 5387, 5463,
 	37, 28, 608, 215, 37, 14, 17639, 747, 3
 };
 
-static_assert(std::size(days) == std::size(job_time),
+static_assert(std::size(job_time) == ndays,
               "days and time have different sizes");
 
 static std::size_t parse(std::string arg)
@@ -61,7 +63,7 @@ static std::size_t parse(std::string arg)
 	std::istringstream s{std::move(arg)};
 	if (!(s >> r))
 		throw std::invalid_argument("Day must be a number");
-	if (r < 1 || r > std::size(days))
+	if (r < 1 || r > ndays)
 		throw std::invalid_argument("Day not in range");
 	return r;
 }
@@ -82,10 +84,11 @@ make_exception_output(const std::exception& e) noexcept
 
 static void
 work(std::uint_fast32_t jobs,
-     std::span<std::promise<std::pair<output_pair, std::chrono::milliseconds>>, std::size(days)> out)
+     std::span<std::promise<std::pair<output_pair, std::chrono::milliseconds>>,
+               ndays> out)
 {
 	using namespace std::literals;
-	for (unsigned d = 0; d < std::size(days); ++d) {
+	for (unsigned d = 0; d < ndays; ++d) {
 		if ((jobs & (std::uint_fast32_t{1} << d)) == 0)
 			continue;
 		std::ostringstream s;
@@ -95,7 +98,9 @@ work(std::uint_fast32_t jobs,
 			const auto start = std::chrono::steady_clock::now();
 			output_pair p = days[d](f);
 			const auto end = std::chrono::steady_clock::now();
-			const auto t = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+			const auto t = std::chrono::duration_cast<
+					std::chrono::milliseconds
+				>(end - start);
 			out[d].set_value(std::pair{std::move(p), t});
 		} catch (const std::exception& e) {
 			out[d].set_value(make_exception_output(e));
@@ -105,17 +110,18 @@ work(std::uint_fast32_t jobs,
 
 static int run_all_tests(const unsigned num_threads) noexcept
 {
+	using namespace std::chrono;
 	const std::vector<std::uint_fast32_t> jobs = make_jobs(num_threads);
 	std::vector<std::thread> workers;
 	workers.reserve(num_threads);
-	std::promise<std::pair<output_pair, std::chrono::milliseconds>> out_promise[std::size(days)];
-	std::future<std::pair<output_pair, std::chrono::milliseconds>> out[std::size(days)];
-	std::chrono::milliseconds durations[std::size(days)];
-	for (unsigned d = 0; d < std::size(days); ++d)
+	std::promise<std::pair<output_pair, milliseconds>> out_promise[ndays];
+	std::future<std::pair<output_pair, milliseconds>> out[ndays];
+	std::chrono::milliseconds durations[ndays];
+	for (unsigned d = 0; d < ndays; ++d)
 		out[d] = out_promise[d].get_future();
 	for (unsigned t = 0; t < num_threads; ++t)
 		workers.emplace_back(work, jobs[t], std::span(out_promise));
-	for (unsigned d = 0; d < std::size(days); ++d) {
+	for (unsigned d = 0; d < ndays; ++d) {
 		auto [p, dur] = out[d].get();
 		durations[d] = std::move(dur);
 		std::cout << "Day " << (d + 1) << '\n' << p.first << '\n'
@@ -124,7 +130,7 @@ static int run_all_tests(const unsigned num_threads) noexcept
 	for (auto& worker : workers)
 		worker.join();
 	std::cout << "Summary:\n";
-	for (unsigned d = 0; d < std::size(days); ++d)
+	for (unsigned d = 0; d < ndays; ++d)
 		std::cout << (d + 1) << '\t' << durations[d] << '\n';
 	std::cout << std::endl;
 	return EXIT_SUCCESS;
@@ -132,10 +138,11 @@ static int run_all_tests(const unsigned num_threads) noexcept
 
 int main(int argc, char *argv[])
 {
-	if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'a' && argv[1][2] == 0) {
+	if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'a'
+	    && argv[1][2] == 0) {
 		return run_all_tests(2);
 	} else if (argc <= 2) {
-		const std::size_t d = argc > 1 ? parse(argv[1]) : std::size(days);
+		const std::size_t d = argc > 1 ? parse(argv[1]) : ndays;
 		const auto [p1, p2] = days[d - 1](std::cin);
 		std::cout << p1 << '\n' << p2 << std::endl;
 	} else {

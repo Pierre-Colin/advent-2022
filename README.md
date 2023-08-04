@@ -46,4 +46,6 @@ Definitely easier than 2021, and by far the year I looked for hints from other u
 
 * one day (17) would involve detecting cycles in a system to skip almost all computations.
 
+You may notice that I did a lot of type aliases and then stopped doing it in the last days. This is due to both laziness and finding out that primitive obsession isn’t remotely as bad as the folks at CppCon said.
+
 Unless GCC’s module support is complete by December 2023, I will not be using C++ next time.
